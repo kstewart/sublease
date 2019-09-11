@@ -8,6 +8,8 @@ import (
 	"log"
 	"math/rand"
 	"os"
+	"strconv"
+	"strings"
 	"time"
 )
 
@@ -43,7 +45,6 @@ func readLine(r io.Reader, lineNum int) (line string, lastLine int, err error) {
 }
 
 func getRandomWord(dictionary string) string {
-	// word := fmt.Sprintf("{%s}", dictionary)
 	randomWord := ""
 	var line int
 	dictFile := fmt.Sprintf("%s.txt", dictionary)
@@ -77,19 +78,30 @@ func getRandomWord(dictionary string) string {
 	return randomWord
 }
 
-func generateRandomTrailingNumber(size int) int {
+func generateRandomTrailingNumber(size int) string {
 	rand.Seed(time.Now().UnixNano())
-	if size > 0 {
-		return rand.Intn(size)
-	} else {
-		// Default
-		return rand.Intn(4)
+
+	upper := strings.Repeat("9", size)
+	upperBound, err := strconv.Atoi(upper)
+	if err != nil {
+		upperBound = 9999
 	}
+	randomNumber := rand.Intn(upperBound)
+	trailing := fmt.Sprintf("%0*d", size, randomNumber)
+
+	return trailing
+}
+
+func getSubdomainName() string {
+	adjective := getRandomWord("adjectives")
+	noun := getRandomWord("nouns")
+	trailing := generateRandomTrailingNumber(4) // Defaulting to 4-digit random suffix for now
+	subdomain := fmt.Sprintf("%s-%s-%s\n", adjective, noun, trailing)
+
+	return subdomain
 }
 
 func main() {
-	adjective := getRandomWord("adjectives")
-	noun := getRandomWord("nouns")
-	trailing := generateRandomTrailingNumber(4)
-	fmt.Printf("%s-%s-%04d\n", adjective, noun, trailing)
+	subdomain := getSubdomainName()
+	fmt.Println(subdomain)
 }
